@@ -5,7 +5,16 @@
 import numpy as np
 
 class BaseModel:
-    def __init__(self, L, base):
+    
+    def __init__(self, L: int, base: float):
+        if (not isinstance(L, int)):
+            raise ValueError("Level (L) in BaseModel should be an integer");
+        if (L < 1):
+            raise ValueError("Level (L) in BaseModel should be >= 1");
+        if (not isinstance(base, (float, int))):
+            raise ValueError("base in BaseModel should be a float or int");
+        if (base <= 1):
+            raise ValueError("base in BaseModel should be > 1");
         self.L = L
         self.base = base
         self.Levels = L+1
@@ -14,25 +23,25 @@ class BaseModel:
     def getBase(self):
         return self.base
     
-    def setErrorConstant(self, Cg):
+    def __setErrorConstant(self, Cg):
         self.Cg = Cg
 
     def getErrorConstant(self):
         return self.Cg
         
-    def setConvergenceRate(self, q):
+    def __setConvergenceRate(self, q):
         self.q = q
 
     def getConvergenceRate(self):
         return self.q
 
-    def setWorkRate(self, r):
+    def __setWorkRate(self, r):
         self.r = r
 
     def getWorkRate(self):
         return self.r
 
-    def setParamDim(self, dim):
+    def __setParamDim(self, dim):
         self.paramDim = dim
 
     def getParamDim(self):
@@ -61,6 +70,9 @@ class BaseModel:
 
     def getNumLevels(self):
         return self.Levels
+
+    def getMaxLevel(self):
+        return self.L
 
     def report(self):
         print(self.samples)

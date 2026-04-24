@@ -2,14 +2,16 @@ import numpy as np
 from BaseModel import BaseModel
 
 class Example(BaseModel):
-    def __init__(self, L, base, error):
+    def __init__(self, L, base, error, q, r):
         super().__init__(L, base)
-        self.setParamDim(2)
-        self.setErrorSize(error)
+        self._BaseModel__setParamDim(2)
+        self.__setErrorSize(error)
+        self._BaseModel__setConvergenceRate(q)
+        self._BaseModel__setWorkRate(r)
         
-    def setErrorSize(self, E):
+    def __setErrorSize(self, E):
         self.E = E
-        self.setErrorConstant(E)
+        self._BaseModel__setErrorConstant(E)
     
     def solveParam(self, param, level):
         gamma = 1./self.base
