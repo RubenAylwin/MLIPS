@@ -26,4 +26,4 @@ jobs:
         pip install -e .
 
     - name: Run test
-      run: python -m unittest tests/BaseModelTests.py
+      run: python -m unittest tests/Tests.py

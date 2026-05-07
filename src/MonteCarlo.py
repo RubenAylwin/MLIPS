@@ -13,7 +13,7 @@ from MLPoints import *
 def reflectAt(r: float, p: float):
     """Reflects given point p on reflection point r"""
     if (not (isinstance(r, (float, int)) and isinstance(p, (float, int)))):
-        raise ValueError("Given values to reflectAt should be floats or ints.")
+        raise TypeError("Given values to reflectAt should be floats or ints.")
     return 2*r - p
 
 
@@ -30,12 +30,12 @@ def generateNewPerturbedSample(sample, scale):
     #Check that sample is iterable
     try:
         iter(sample)
-    except Exception as e:
-        print(getattr(e), "message", repr(e))
+    except TypeError as e:
+        logging.error("Given sample point to generateNewPerturbedSample should be iterable (even if its dimension is 1).")
 
     #Check that scale is int or float.
     if (not isinstance(scale, (float, int))):
-        raise ValueError("Given scale to generateNewPerturbedSample should be int or float.")
+        raise TypeError("Given scale to generateNewPerturbedSample should be int or float.")
 
     #Placeholder for new sample
     newSample = [];
@@ -43,7 +43,7 @@ def generateNewPerturbedSample(sample, scale):
     for s in sample:
         #Check that values in sample are ints or floats
         if (not isinstance(s, (float, int))):
-            raise ValueError("Given coordinates in sample given to generateNewPerturbedSample should be ints or floats.")
+            raise TypeError("Given coordinates in sample given to generateNewPerturbedSample should be ints or floats.")
 
         #Perturbation on current dimension
         res = np.random.normal(loc=s, scale=scale);
@@ -68,7 +68,7 @@ class MCSampler:
 
         #Check that given model inherits from BaseModel
         if (not isinstance(model, BaseModel)):
-            raise ValueError("Given model should inherit from BaseModel")
+            raise TypeError("Given model should inherit from BaseModel")
         
         self.model = model
         self.Dim = self.model.getParamDim();
@@ -262,7 +262,7 @@ class MonteCarloIPS(MonteCarlo):
         result = 0.0
 
         #Samples per level.
-        Samples = mlmkSamples(self.model.getConvergenceRate(), self.model.getWorkRate(), 1./self.model.getBase(), level)*mult
+        Samples = mlmcIpsSamples(self.model.getConvergenceRate(), self.model.getWorkRate(), 1./self.model.getBase(), level)*mult
 
         #Numerical method's convergence rate and initial size for Markov transition
         q = self.model.getConvergenceRate()
@@ -425,9 +425,9 @@ class MonteCarloIPSW(MonteCarlo):
         #If desiredCost>0, then choose samples so that total cost is close to desired cost.
         Samples = None
         if (desiredCost>0.):
-            Samples = mlmkSamples(self.model.getConvergenceRate(), self.model.getWorkRate(), 1./self.model.getBase(), level, costT)
+            Samples = mlmcIpsSamples(self.model.getConvergenceRate(), self.model.getWorkRate(), 1./self.model.getBase(), level, costT)
         else:
-            Samples = mlmkSamples(self.model.getConvergenceRate(), self.model.getWorkRate(), 1./self.model.getBase(), level)*mult
+            Samples = mlmcIpsSamples(self.model.getConvergenceRate(), self.model.getWorkRate(), 1./self.model.getBase(), level)*mult
             
 
         #Numerical method's convergence rate and initial size for Markov transition

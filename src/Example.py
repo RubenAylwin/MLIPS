@@ -21,12 +21,5 @@ class Example(BaseModel):
         
         qoi = (0.5*param[0])**2.+(0.5*param[1])**2.+self.E*gamma**(self.q*level)*0.5*(np.sin(param[0]/(level+1))-np.cos(param[1]/(level+1)))
         cost = self.costLevel(level)
-        return {"QoI" : qoi, "Cost" : cost}
-    
-if __name__=="__main__":
-    print("hello")
-    test = Example(10, 6, 0.2)
-    test.setConvergenceRate(2)
-    test.setWorkRate(3)
-    
+        return {"QoI" : qoi, "Cost" : cost}    
     
