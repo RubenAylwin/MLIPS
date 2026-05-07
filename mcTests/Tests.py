@@ -1,5 +1,5 @@
-from MLPointsTests import *
-from BaseModelTests import *
+from mcTests.MLPointsTests import *
+from mcTests.BaseModelTests import *
 
 if __name__=='__main__':
     unittest.main()
