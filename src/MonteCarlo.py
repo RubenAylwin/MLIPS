@@ -32,6 +32,7 @@ def generateNewPerturbedSample(sample, scale):
         iter(sample)
     except TypeError as e:
         logging.error("Given sample point to generateNewPerturbedSample should be iterable (even if its dimension is 1).")
+        raise TypeError("Given sample point to generateNewPerturbedSample should be iterable (even if its dimension is 1).")
 
     #Check that scale is int or float.
     if (not isinstance(scale, (float, int))):
@@ -75,12 +76,16 @@ class MCSampler:
 
 class MonteCarlo(MCSampler):
     """Simple Monte Carlo sampler."""
-    
-    def getExpectation(self, cutoff, N, level):
+
+    def __init__(self, model: BaseModel):
+        """Initializer. Only recieves an instance of BaseModel to compute the QoI."""
+        super().__init__(model)
+        self.name = "MC"
+        
+    def getExpectation(self, cutoff, level):
         """
         Compute the expectation that the QoI is less than the cutoff.
         cutoff: value for which we compute Pr(QoI < cutoff).
-        N: Number of samples to compute.
         level: Discretization level of the BaseModel that should be used.
 
         Returns dictionary with two keys:
@@ -91,7 +96,7 @@ class MonteCarlo(MCSampler):
         #Variables to save result and cost of computation.
         result = 0.0;
         cost = 0.0
-        
+        N = int(self.model.getBase()**(2*level*self.model.getConvergenceRate())+1)
         for _ in range(N):
             p = [np.random.uniform(-1.,1.) for __ in range(self.Dim)]
             solution = self.model.solveParam(p, level)
@@ -108,6 +113,11 @@ class MonteCarlo(MCSampler):
 
 class MonteCarloAd(MonteCarlo):
     """Monte Carlo sampler with adaptive approximation of probability functional."""
+
+    def __init__(self, model: BaseModel):
+        """Initializer. Only recieves an instance of BaseModel to compute the QoI."""
+        super().__init__(model)
+        self.name = "Ad. MC"
     
     def getExpectation(self, cutoff, N, level):
         """
@@ -141,6 +151,11 @@ class MonteCarloAd(MonteCarlo):
 
 class MonteCarloML(MonteCarlo):
     """Multi level Monte Carlo sampler."""
+
+    def __init__(self, model: BaseModel):
+        """Initializer. Only recieves an instance of BaseModel to compute the QoI."""
+        super().__init__(model)
+        self.name = "MLMC"
 
     def getExpectation(self, cutoff, level, mult=1):
         """
@@ -189,7 +204,12 @@ class MonteCarloML(MonteCarlo):
 
 class MonteCarloMLAd(MonteCarlo):
     """Multi level Monte Carlo sampler with adaptive solver."""
-    
+
+    def __init__(self, model: BaseModel):
+        """Initializer. Only recieves an instance of BaseModel to compute the QoI."""
+        super().__init__(model)
+        self.name = "Ad. MLMC"
+
     def getExpectation(self, cutoff, level, mult=1):
         """
         Compute the expectation that the QoI is less than the cutoff.
@@ -244,6 +264,11 @@ class MonteCarloMLAd(MonteCarlo):
     
 class MonteCarloIPS(MonteCarlo):
     """Multi level Monte Carlo sampler with interacting particle system"""
+
+    def __init__(self, model: BaseModel):
+        """Initializer. Only recieves an instance of BaseModel to compute the QoI."""
+        super().__init__(model)
+        self.name = "IPS"
     
     def getExpectation(self, cutoff, level, mult=1):
         """
@@ -403,6 +428,10 @@ class MonteCarloIPSW(MonteCarlo):
     Because of this, it  does not need that the samples have any property, every sample
     is a possible seed and the chance that they are used is given by the exponential weight.
     """
+    def __init__(self, model: BaseModel):
+        """Initializer. Only recieves an instance of BaseModel to compute the QoI."""
+        super().__init__(model)
+        self.name = "IPS W."
 
     def getExpectation(self, cutoff, level, mult=1, desiredCost=0.):
         """
