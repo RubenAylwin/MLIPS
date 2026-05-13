@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 pC = 0
-LS=["-", (0, (2, 2)), (0, (7, 2)), (0, (6, 3, 3, 3)), (0, (6, 3, 3, 3, 3, 3))]
+LS=["-", (0, (3, 3)), (0, (7, 2)), (0, (6, 3, 3, 3)), (0, (6, 3, 3, 3, 3, 3))]
 
 
 def runSim(MCSampler, level, cutoff, realizations):
@@ -78,6 +78,11 @@ if __name__=='__main__':
     if (ipsw):
         MC = MonteCarloIPSW(inst)
         runSim(MC,L,y,R)
-
-    plt.legend()
-    plt.show()
+    plt.xlabel("Work", fontsize=15)
+    plt.ylabel("Relative Error", fontsize=15)
+    plt.xticks(fontsize=13)
+    plt.yticks(fontsize=13)
+    plt.legend(fontsize=11, ncol=3, loc='upper right')
+    plt.grid()
+    plt.gcf().set_size_inches(10, 5)
+    plt.savefig("fig.pdf", format='pdf')
