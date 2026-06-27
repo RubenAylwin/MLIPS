@@ -1,5 +1,5 @@
 import unittest
-from BaseModel import BaseModel
+from mlips.BaseModel import BaseModel
 
 
 class BaseModelTest(unittest.TestCase):

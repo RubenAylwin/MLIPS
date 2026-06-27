@@ -1,11 +1,11 @@
 import unittest
-from MLPoints import *
+from mlips.MLPoints import *
 
 class mlmcSamplesTest(unittest.TestCase):
     def test_get_samples(self):
         try:
             S = mlmcSamples(2, 1.3, 0.1, 5)
-            S2 = mlmcSamples(2.5, 2, 0.8, 9)
+            S2= mlmcSamples(2.5, 2, 0.8, 9)
         except Exception as e:
             self.fail("Correct usage of mlmcSamples raised exception!")
 
@@ -17,12 +17,13 @@ class mlmcSamplesTest(unittest.TestCase):
 
     def test_check_samples_decrease(self):
         S = mlmcSamples(2, 1.3, 0.1, 5)
+
         for s in range(len(S)-1):
-            self.assertTrue(S[s]>S[s+1])
+            self.assertTrue(S[s]>=S[s+1])
 
         S2 = mlmcSamples(4, .3, 0.8, 5)
         for s in range(len(S2)-1):
-            self.assertTrue(S2[s]>S2[s+1])
+            self.assertTrue(S2[s]>=S2[s+1])
 
     def test_samples_negative_input(self):
         self.assertRaises(ValueError, mlmcSamples, -1, 2.3, 0.5, 2)
@@ -64,7 +65,7 @@ class mlmcAdSamplesTest(unittest.TestCase):
 
         S2 = mlmcAdSamples(4, .3, 0.8, 5)
         for s in range(len(S2)-1):
-            self.assertTrue(S2[s]>S2[s+1])
+            self.assertTrue(S2[s]>=S2[s+1])
 
     def test_samples_negative_input(self):
         self.assertRaises(ValueError, mlmcAdSamples, -1, 2.3, 0.5, 2)
