@@ -1,6 +1,7 @@
 from MonteCarlo import MonteCarlo, MonteCarloIPS, MonteCarloIPSW, MonteCarloMLAd, MonteCarloML
-from Example import Example
+from Example import ExampleDim
 import numpy as np
+from scipy.special import gamma as gammaFun
 import matplotlib.pyplot as plt
 import argparse
 pC = 0
@@ -19,7 +20,7 @@ def rateComp(X,Y):
     print(rates)
     return np.average(rates), p[1]
 
-def runSim(MCSampler, level, cutoff, realizations, mult = 1):
+def runSim(MCSampler, level, cutoff, realizations, ok, mult = 1):
     global pC
     global modelCounter
     modelCounter+=1
@@ -33,7 +34,7 @@ def runSim(MCSampler, level, cutoff, realizations, mult = 1):
         for r in range(realizations):
             print(">    Working on level "+str(l)+" - progress: "+str(r)+"/"+str(realizations),end='\r')
             result = MCSampler.getExpectation(cutoff, l, mult)
-            error += (result['P']/(np.pi*cutoff)-1.)**2.0/realizations
+            error += (result['P']/(ok)-1.)**2.0/realizations
             work += result["C"]/realizations
             #print("",end='')
         error = np.sqrt(error)
@@ -49,6 +50,7 @@ def runSim(MCSampler, level, cutoff, realizations, mult = 1):
     pC += 1
     
 if __name__=='__main__':
+    dim = 2
     parser = argparse.ArgumentParser(prog='runExperiment',
                                      description='Run an experiment for convergence of required MC methods with specified parameters.')
     parser.add_argument('--ips', action='store_true', help = 'flag to turn on MLIPS')
@@ -77,30 +79,35 @@ if __name__=='__main__':
     ips = args['ips']
     ipsw = args['ipsw']
     mlmc = args['mlmc']
-    mlad  = args['mlad']
+    mlad = args['mlad']
     R = args['realizations']
     fn = args['file_name']
-    inst = Example(L, 1./g, E, q, r)
+    inst = ExampleDim(L, 1./g, E, q, r, dim)
+
+    spaceSize = 2.**dim
+    sphereSize = np.pi**(dim/2.)*(4.*y)**(dim/2.)/gammaFun(dim/2.0+1.)
+    ok = sphereSize/spaceSize
+    print(ok)
 
     if (mc):
         MC = MonteCarlo(inst)
-        runSim(MC,int((L+1.)/2.),y,R)
+        runSim(MC,int((L+1.)/2.),y,R, ok)
 
     if (mlmc):
         MC = MonteCarloML(inst)
-        runSim(MC,L,y,R)
+        runSim(MC,L,y,R, ok)
 
     if (mlad):
         MC = MonteCarloMLAd(inst)
-        runSim(MC,L,y,R)
+        runSim(MC,L,y,R, ok)
         
     if (ips):
         MC = MonteCarloIPS(inst)
-        runSim(MC,L-1,y,R)
-
+        runSim(MC,L-1,y,R, ok)
+        MC.plotSamples(np.sqrt(4*y))
     if (ipsw):
         MC = MonteCarloIPSW(inst)
-        runSim(MC,L-1,y,R)
+        runSim(MC,L-1,y,R, ok)
         
     plt.xlabel("Work", fontsize=15)
     plt.ylabel("Relative Error", fontsize=15)

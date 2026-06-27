@@ -5,6 +5,13 @@
 import numpy as np
 import logging
 
+def resizing(gamma, l, q, r):
+    if (q==r):
+        return (l+1)
+    if (q>r):
+        return (1.-gamma**(0.5*(q-r)))
+    if (q<r):
+        return gamma**(l*(q-r))*(1.-gamma**(0.5*(r-q)))
 def mlmcAdSamples(q: float, r: float, gamma: float, level: int):
     """
     Returns samples for adaptive MLMC method.
@@ -23,7 +30,9 @@ def mlmcAdSamples(q: float, r: float, gamma: float, level: int):
     if (r < 0. or q < 0.):
         raise ValueError("r and q in mlmcAdSamples should be positive.")
     r = r - q
-    samples = np.array([gamma**(-q*2*(level))*gamma**(0.5*(l)*(q+r)) for l in range(level+1)])
+    samples = np.array([gamma**(-2*(level))*gamma**(0.5*(l)*(q+r)) for l in range(level+1)])
+    if (samples[-1] < 1):
+        samples = samples/samples[-1]
     samples = np.array([1+int(a-1.) for a in samples])
 
     return samples
@@ -46,7 +55,9 @@ def mlmcSamples(q: float, r: float, gamma: float, level: int):
     if (r < 0. or q < 0.):
         raise ValueError("r and q in mlmcSamples should be positive.")
     
-    samples = np.array([gamma**(-q*2*(level))*gamma**(0.5*(l)*(q+r)) for l in range(level+1)])
+    samples = np.array([gamma**(-2*(level))*gamma**(0.5*(l)*(q+r)) for l in range(level+1)])
+    if (samples[-1] < 1):
+        samples = samples/samples[-1]
     samples = np.array([1+int(a-1.) for a in samples])
     return samples
 
@@ -70,12 +81,14 @@ def mlmcIpsSamples(q: float, r: float, gamma: float, level: int, work=None):
     if (r < 0. or q < 0.):
         raise ValueError("r and q in mlmcIpsSamples should be positive.")
 
-    samples = None
+    
+    samples = np.array([gamma**(-2*(level))*gamma**(2./3.*(l)*(q+r)) for l in range(level+1)])
+    if (samples[-1] < 1):
+        samples = samples/samples[-1]
+    
     if(not isinstance(work,(float, int))):
         if (work is not None):
-            logging.warning("work field in mlmcIpsSamples is not float nor int, but is not None.")
-            
-        samples = np.array([(l+1)*gamma**(-q*2*(level))*gamma**(2./3.*(l)*(q+r)) for l in range(level+1)])
+            logging.warning("work field in mlmcIpsSamples is not float nor int, but is not None.")        
     else:
         samples = samples*work/self.costSamplesML(samples)
                 

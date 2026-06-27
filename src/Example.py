@@ -22,4 +22,28 @@ class Example(BaseModel):
         qoi = (0.5*param[0])**2.+(0.5*param[1])**2.+self.E*gamma**(self.q*level)*0.5*(np.sin(param[0]/(level+1))-np.cos(param[1]/(level+1)))
         cost = self.costLevel(level)
         return {"QoI" : qoi, "Cost" : cost}    
+
+class ExampleDim(BaseModel):
+    def __init__(self, L, base, error, q, r, dim):
+        super().__init__(L, base)
+        self._BaseModel__setParamDim(dim)
+        self.__setErrorSize(error)
+        self._BaseModel__setConvergenceRate(q)
+        self._BaseModel__setWorkRate(r)
+        
+        
+    def __setErrorSize(self, E):
+        self.E = E
+        self._BaseModel__setErrorConstant(E)
     
+    def solveParam(self, param, level):
+        gamma = 1./self.base
+        dim = self.getParamDim()
+        if (level == -1):
+            return {"QoI" : 0.0, "Cost" : 0.0}
+        qoi = 0.0
+        for d in range(dim):
+            qoi += (0.5*param[d])**2.+self.E*gamma**(self.q*level)*1./dim*np.sin(param[d]/(level+d+1))
+        cost = self.costLevel(level)
+        return {"QoI" : qoi, "Cost" : cost}    
+

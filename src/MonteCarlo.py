@@ -82,7 +82,7 @@ class MonteCarlo(MCSampler):
         super().__init__(model)
         self.name = "MC"
         
-    def getExpectation(self, cutoff, level):
+    def getExpectation(self, cutoff, level, mult = 1):
         """
         Compute the expectation that the QoI is less than the cutoff.
         cutoff: value for which we compute Pr(QoI < cutoff).
@@ -96,7 +96,7 @@ class MonteCarlo(MCSampler):
         #Variables to save result and cost of computation.
         result = 0.0;
         cost = 0.0
-        N = int(self.model.getBase()**(2*level*self.model.getConvergenceRate())+1)
+        N = int(mult*self.model.getBase()**(2*level*self.model.getConvergenceRate())+1)
         for _ in range(N):
             p = [np.random.uniform(-1.,1.) for __ in range(self.Dim)]
             solution = self.model.solveParam(p, level)
@@ -197,7 +197,7 @@ class MonteCarloML(MonteCarlo):
                 levelResult += yl-yl_1
                 
             #Add results at current level.
-            result += levelResult/N
+            result += levelResult*1./N
             
         return {"P" : result, "C" : cost}
 
@@ -210,6 +210,37 @@ class MonteCarloMLAd(MonteCarlo):
         super().__init__(model)
         self.name = "Ad. MLMC"
 
+    def plotSamples(self, r, name):
+        assert(self.Dim==2)
+        t = np.array([i/1000 for i in range(1001)])
+        XC = r*np.cos(2.*np.pi*t)
+        YC = r*np.sin(2.*np.pi*t)
+        c=0
+        numPoints = []
+        for i in range(len(self.LowLevelPoints)):
+            sL = self.LowLevelPoints[i]
+            sH = self.HighLevelPoints[i]
+            numPoints.append(len(sH))
+            continue
+            XL=np.array([sL[i][0] for i in range(len(sL))])
+            YL=np.array([sL[i][1] for i in range(len(sL))])
+            XH=np.array([sH[i][0] for i in range(len(sH))])
+            YH=np.array([sH[i][1] for i in range(len(sH))])
+
+            plt.scatter(XL,YL, s=8, alpha=0.25, color="C0")
+            plt.scatter(XH,YH, s=8, alpha=1., color="C0")
+            plt.plot(XC, YC, color="C1", lw = 3, alpha=0.8)
+            plt.xlabel("$x$", fontsize=15)
+            plt.ylabel("$y$", fontsize=15)
+            plt.xticks(fontsize=13)
+            plt.yticks(fontsize=13)
+            plt.xticks([-1,0,1])
+            plt.yticks([-1,0,1])
+            plt.gcf().set_size_inches(5, 5)
+            plt.savefig(name+str(c)+".pdf", format='pdf')
+            plt.show()
+            c+=1
+        return numPoints
     def getExpectation(self, cutoff, level, mult=1):
         """
         Compute the expectation that the QoI is less than the cutoff.
@@ -228,13 +259,13 @@ class MonteCarloMLAd(MonteCarlo):
 
         #Samples per level.
         Samples = mlmcAdSamples(self.model.getConvergenceRate(), self.model.getWorkRate(), 1./self.model.getBase(), level)*mult
-
+        self.LowLevelPoints=[[] for _ in range(len(Samples))]
+        self.HighLevelPoints=[[] for _ in range(len(Samples))]
         for l in range(len(Samples)):
             N = Samples[l]
             levelResult = 0.0
             for _ in range(N):
                 p = [np.random.uniform(-1.,1.) for __ in range(self.Dim)]
-
                 #Solution at level l-1 and cost.
                 res_l_1 = self.model.solveParamAd(p, cutoff, l-1)
                 cost += res_l_1["Cost"]
@@ -242,12 +273,13 @@ class MonteCarloMLAd(MonteCarlo):
                 #If previous solution was solved exactly, then
                 #there is no need to solve the next level.
                 if (res_l_1["Exact"]):
+                    self.LowLevelPoints[l].append(p)
                     continue
 
                 #Solution at level l and cost.
                 res_l = self.model.solveParam(p,l)
                 cost += res_l["Cost"]
-
+                self.HighLevelPoints[l].append(p)
                 #Check where solutions fall.
                 yl_1 = int(res_l_1["QoI"]<cutoff and l>0)
                 yl = int(res_l["QoI"]<cutoff)
@@ -269,7 +301,33 @@ class MonteCarloIPS(MonteCarlo):
         """Initializer. Only recieves an instance of BaseModel to compute the QoI."""
         super().__init__(model)
         self.name = "IPS"
-    
+
+    def plotSamples(self, r, name):
+        assert(self.Dim==2)
+        t = np.array([i/1000 for i in range(1001)])
+        XC = r*np.cos(2.*np.pi*t)
+        YC = r*np.sin(2.*np.pi*t)
+        c=0
+        numPoints = []
+        for s in self.LevelPoints:
+            points = [s[i]["Point"] for i in range(len(s))]
+            numPoints.append(len(points))
+            continue
+            X=np.array([s[i]["Point"][0] for i in range(len(s))])
+            Y=np.array([s[i]["Point"][1] for i in range(len(s))])
+            plt.scatter(X,Y, s=8, color="C0")
+            plt.plot(XC, YC, color="C1", lw = 3, alpha=0.8)
+            plt.xlabel("$x$", fontsize=15)
+            plt.ylabel("$y$", fontsize=15)
+            plt.xticks(fontsize=13)
+            plt.yticks(fontsize=13)
+            plt.xticks([-1,0,1])
+            plt.yticks([-1,0,1])
+            plt.gcf().set_size_inches(5, 5)
+            plt.savefig(name+str(c)+".pdf", format='pdf')
+            plt.show()
+            c+=1
+        return np.array(numPoints)
     def getExpectation(self, cutoff, level, mult=1):
         """
         Compute the expectation that the QoI is less than the cutoff.
@@ -291,7 +349,6 @@ class MonteCarloIPS(MonteCarlo):
 
         #Numerical method's convergence rate and initial size for Markov transition
         q = self.model.getConvergenceRate()
-        mk = 1.0
         
         #Samples for the first level. Computed beforehand
         #and saved in a dictionary to keep additional information.
@@ -302,10 +359,13 @@ class MonteCarloIPS(MonteCarlo):
         # Weight is Fixed to 1 since this implementation considers indicator
         # functions for the FK-Measures.
         samplePoints = np.array([{"Point" : [np.random.uniform(-1., 1.) for _ in range(self.Dim)], "QoI" : 0.0, "Diff" : 0.0, "Weight" : 1.0} for _ in range(Samples[0])])
-
+        
+        self.LevelPoints=[]
+        self.LevelPoints.append(samplePoints)
         #Keep track of conditional probabilities (FK normalization in general)
         prob = 1.0
         
+        mk = 1.0*self.model.getErrorConstant()/np.sqrt(self.Dim)
         for l in range(len(Samples)):
             #Limit for definition of sampling sets
             limit = self.model.getLimit(l)
@@ -355,8 +415,8 @@ class MonteCarloIPS(MonteCarlo):
                     condProb += 1.0
 
             #Compute conditional probability and add up this level's contribution.
-            condProb /= len(samplePoints)
-            levelResult /= len(samplePoints)
+            condProb /= 1.*len(samplePoints)
+            levelResult /= 1.*len(samplePoints)
             
             result += prob*levelResult
 
@@ -383,7 +443,8 @@ class MonteCarloIPS(MonteCarlo):
             #Compute Markov transition on each point. This loop controls how many
             #evaluations of the transition we compute per point. More evaluations
             #yields higher independence and smaller error, but higher cost.
-            for j in range(1):
+            indexSet = set()
+            for j in range(2):
                 #Keep track of how many points are accepted
                 accepted = 0.0
                 for i in range(len(samplePoints)):
@@ -397,6 +458,7 @@ class MonteCarloIPS(MonteCarlo):
 
                     #If distance is still under limit, accept point
                     if (diff<limit):
+                        indexSet.add(i)
                         samplePoints[i]["Point"] = p
                         samplePoints[i]["QoI"]=res_l["QoI"]
                         samplePoints[i]["Diff"]=diff
@@ -404,12 +466,13 @@ class MonteCarloIPS(MonteCarlo):
                         
                 accepted /= len(samplePoints)
                 #if accepted points fall below a certain threshold, decrease size.
-                if (accepted < 0.3):
-                    mk /= 2.
+                if (accepted < 0.2):
+                    mk /= 1.5
                 #if accepted points fall above a certain threshold, increase size.
-                if (accepted > 0.9):
-                    mk *= 2.
-                
+                if (accepted > 0.8):
+                    mk *= 2
+            individualPointList = [samplePoints[i] for i in indexSet]
+            self.LevelPoints.append(individualPointList)
         return {"P" : result, "C" : cost}
 
 
@@ -461,8 +524,7 @@ class MonteCarloIPSW(MonteCarlo):
 
         #Numerical method's convergence rate and initial size for Markov transition
         q = self.model.getConvergenceRate()
-        mk = 1.0
-            
+        mk = 1.0*self.model.getErrorConstant()
         #Samples for the first level. Computed beforehand
         #and saved in a dictionary to keep additional information.
         #'Point': evaluation point.
