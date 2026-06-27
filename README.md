@@ -39,11 +39,9 @@ The goal of the project is to analyze how different sampling strategies converge
 
 We consider the estimation of a probability of the form:
 
-$$
-\mathbb{P}_{\mu}[\{f(x)>0\}] = \int \mathbf{1}_{f(x)>0}\mu(dx),
-$$
+$$\mathbb{P}_{\mu}[\{f(x)>0\}] = \int \mathbf{1}_{f(x)>0}\mu(dx),$$
 
-in situations where $f(x)$ can only be computed numerically by a sequence of numerical approximations $\{f_\ell\}_{\ell\in\mathbb{N}_0}$
+in situations where $f(x)$ can only be computed numerically by a sequence of numerical approximations $(f_\ell)_{\ell\in\mathbb{N}_0}$
 whose precision increases as $\ell$ increases, as well as the computational cost of computing the approximation.
 
 In the next sections we briefly mention how each estimator is computed, for further details we refer to the research article mentioned above and
