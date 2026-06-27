@@ -10,13 +10,6 @@ LS=["-", (0, (3, 3)), (0, (7, 2)), (0, (6, 3, 3, 3)), (0, (6, 3, 3, 3, 3, 3))]
 def rateComp(X,Y):
     p=np.polyfit(X, Y, 1)
     rates = (Y[1:] - Y[:-1])/(X[1:] - X[:-1])
-    # p1 = np.percentile(rates, 75)
-    # p2 = np.percentile(rates, 25)
-    # d = p1-p2
-    # q1 = np.average(rates)+1.5*d
-    # q2 = np.average(rates)-1.5*d
-    # rates = rates[(rates < p1) & (rates > p2)]
-    print(rates)
     return np.average(rates), p[1]
 
 def runSim(MCSampler, level, cutoff, realizations, mult = 1):
@@ -43,7 +36,6 @@ def runSim(MCSampler, level, cutoff, realizations, mult = 1):
         print(">    Done with level "+str(l))
     print("=============================================")
     p=rateComp(np.log(Work), np.log(Error))
-    #p=np.polyfit(np.log(Work[-5:-1]), np.log(Error[-5:-1]), 1)
     plt.loglog(Work, Error, marker = 'o', lw = 2, markersize = 8, label = MC.name)
     plt.loglog(Work, Error[-1]*(np.array(Work)/Work[-1])**p[0], marker = '', lw = 1.5, color='k', label="Rate "+'%.2f' % p[0], ls = LS[pC])
     pC += 1

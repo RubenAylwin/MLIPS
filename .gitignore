@@ -215,3 +215,4 @@ __marimo__/
 *.svg
 *.png
 *.sh
+p_*.py
