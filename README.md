@@ -23,7 +23,7 @@ It provides modular implementations for different multilevel estimators, includi
 The Adaptive Multilevel Monte Carlo Simulation method was proposed in:
 
 ```
-Elfverson, Hellman, and Målqvist (2016), *A Multilevel Monte Carlo Method for Computing Failure Probabilities*,
+Elfverson, Hellman, and Målqvist (2016), A Multilevel Monte Carlo Method for Computing Failure Probabilities,
 SIAM/ASA Journal on Uncertainty Quantification. https://doi.org/10.1137/140984294
 ```
 
@@ -39,9 +39,9 @@ The goal of the project is to analyze how different sampling strategies converge
 
 We consider the estimation of a probability of the form:
 
-$
+$$
 \mathbb{P}_{\mu}[\{f(x)>0\}] = \int \mathbf{1}_{f(x)>0}\mu(dx),
-$
+$$
 
 in situations where $f(x)$ can only be computed numerically by a sequence of numerical approximations $\{f_\ell\}_{\ell\in\mathbb{N}_0}$
 whose precision increases as $\ell$ increases, as well as the computational cost of computing the approximation.
