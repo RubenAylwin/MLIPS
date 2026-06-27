@@ -52,18 +52,14 @@ to our work (currently in preparation).
 
 The standard (single level) Monte Carlo estimator is computed as:
 
-$
-\frac{1}{N} \sum_{i=1}^{N} \mathbb{1}_{f_\ell(x)>0}(x_i).
-$
+$$\frac{1}{N} \sum_{i=1}^{N} \mathbb{1}_{f_\ell(x)>0}(x_i).$$
 
 
 ## 3. Multilevel Monte Carlo Estimator
 
 The standard Multilevel Monte Carlo estimator is computed as:
 
-$
-\sum_{\ell=0}^{L}\frac{1}{N_\ell} \sum_{i=1}^{N_\ell} \mathbb{1}_{f_\ell(x)>0}(x^{(\ell)}_i)-\mathbb{1}_{f_{\ell-1}(x)>0}(x^{(\ell)}_i),
-$
+$$\sum_{\ell=0}^{L}\frac{1}{N_\ell} \sum_{i=1}^{N_\ell} \mathbb{1}_{f_\ell(x)>0}(x^{(\ell)}_i)-\mathbb{1}_{f_{\ell-1}(x)>0}(x^{(\ell)}_i),$$
 
 where $\mathbb{1}_{f_{0-1}(x)>0}(x)=0$ for all $x$.
 The number of samples per level are chosen so as to minimize the required computational work in order to achieve a certain accuracy.
@@ -84,9 +80,7 @@ far away from $0$, then \mathbb{1}_{f_\ell(x)>0}(x) is exact.
 ## 5. Multilevel Interacting Particle System
 The proposed MLIPS method computes, similar as before, an estimate of the form
 
-$
-\sum_{\ell=0}^{L}\hat{p}_\ell\frac{1}{N_\ell} \sum_{i=1}^{N_\ell} \mathbb{1}_{f_\ell(x)>0}(x^{(\ell)}_i)-\mathbb{1}_{f_{\ell-1}(x)>0}(x^{(\ell)}_i),
-$
+$$\sum_{\ell=0}^{L}\hat{p}_\ell\frac{1}{N_\ell} \sum_{i=1}^{N_\ell} \mathbb{1}_{f_\ell(x)>0}(x^{(\ell)}_i)-\mathbb{1}_{f_{\ell-1}(x)>0}(x^{(\ell)}_i),$$
 
 with the difference that $x^{(\ell)}_i$ no longer follows the base probability law $\mu$, but rather are sequentially generated so as to concentrate near the
 limit surface $f(y)=0$, since it is only there that the multilevel contributions $\mathbb{1}_{f_\ell(x)>0}(x^{(\ell)}_i)-\mathbb{1}_{f_{\ell-1}(x)>0}(x^{(\ell)}_i)$
