@@ -48,7 +48,7 @@ if __name__=='__main__':
     parser.add_argument('--mc', action='store_true', help = 'flag to turn on MC')
     parser.add_argument('--mlmc', action='store_true', help = 'flag to turn on MLMC')
     parser.add_argument('--mlad', action='store_true', help = 'flag to turn on adaptive MLMC')
-    parser.add_argument('--realizations', type = int, required = True, help = 'flag to turn on adaptive MLMC')
+    parser.add_argument('--realizations', type = int, required = True, help = 'number of realizations of each estimator (to decrease noise)')
     parser.add_argument('-f', '--file_name', type = str, help = 'name to save figure')
     parser.add_argument('-L', '--level', type = int, required = True, help = 'Max level')
     parser.add_argument('-Y', '--cutoff', type = float, required = True, help = 'Cutoff for probability (QoI < cutoff)')
