@@ -7,8 +7,8 @@ import random
 import copy
 import matplotlib.pyplot as plt
 import logging
-from BaseModel import BaseModel
-from MLPoints import *
+from .BaseModel import BaseModel
+from .MLPoints import *
 
 def reflectAt(r: float, p: float):
     """Reflects given point p on reflection point r"""

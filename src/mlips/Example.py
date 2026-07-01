@@ -1,5 +1,5 @@
 import numpy as np
-from BaseModel import BaseModel
+from .BaseModel import BaseModel
 
 class Example(BaseModel):
     def __init__(self, L, base, error, q, r):

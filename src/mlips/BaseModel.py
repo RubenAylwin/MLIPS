@@ -98,9 +98,3 @@ class BaseModel:
                 return {"QoI" : qoi, "Diff" : test, "Cost" : cost, "Exact" : True}
 
         return {"QoI" : qoi, "Diff" : test, "Cost" : cost, "Exact" : False}
-    
-if __name__=="__main__":
-    base = BaseModel(10, 2)
-    base.setConvergenceRate(2)
-    base.setWorkRate(1)
-    print(base.costSamples(base.mlmkSamples("W",1000000)))

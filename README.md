@@ -5,7 +5,7 @@
 Clone the repository and install the package in editable mode:
 
 ```bash
-git clone https://github.com/your-username/mlips.git
+git clone https://github.com/RubenAylwin/mlips.git
 cd mlips
 pip install -e .
 ```

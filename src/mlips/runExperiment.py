@@ -1,5 +1,5 @@
-from MonteCarlo import MonteCarlo, MonteCarloIPS, MonteCarloIPSW, MonteCarloMLAd, MonteCarloML
-from Example import Example
+from .MonteCarlo import MonteCarlo, MonteCarloIPS, MonteCarloIPSW, MonteCarloMLAd, MonteCarloML
+from .Example import Example
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
