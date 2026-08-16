@@ -30,12 +30,18 @@ class BaseModel:
         return self.Cg
         
     def __setConvergenceRate(self, q):
+        if (q <= 0):
+            raise ValueError("Convergence rate (q) in BaseModel should be > 0");
+        
         self.q = q
 
     def getConvergenceRate(self):
         return self.q
 
     def __setWorkRate(self, r):
+        if (r <= 0):
+            raise ValueError("Work rate (r) in BaseModel should be > 0");
+
         self.r = r
 
     def getWorkRate(self):
@@ -93,8 +99,8 @@ class BaseModel:
             qoi = res["QoI"]
             cost += res["Cost"]
             test = np.abs(qoi-cutoff)
-
+            
             if (test>self.Cg*(1./self.base)**(self.q*l)):
                 return {"QoI" : qoi, "Diff" : test, "Cost" : cost, "Exact" : True}
-
+            
         return {"QoI" : qoi, "Diff" : test, "Cost" : cost, "Exact" : False}
